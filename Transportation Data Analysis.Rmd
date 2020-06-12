@@ -1,0 +1,122 @@
+---
+title: "Transportation Project Final Analysis"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+df <- read.csv("also_final_data.csv",header = TRUE, stringsAsFactors = FALSE, col.names = c("time", "college", "major", "age", "distance", "skip1", "skip2", "skip3", "neighborhood", "rent_avg", "utilities_avg", "utilities_feb", "utilities_oct", "driving_serv", "feb_drive_money", "feb_drive_list", "oct_drive_money", "oct_drive_list", "bus_week", "own_car", "gas", "parking", "ridesharing_yn", "ridesharing_times"))
+```
+
+```{r}
+temp <- df$utilities_avg
+temp[8] = 31
+temp[22] = 87
+df$utilities_avg <- temp
+neighborhoods <- unique(df['neighborhood'])
+rent_avg <- rep(0, 8)
+util_avg <- rep(0,8)
+size <- rep(0,8)
+transport <- rep(0,8)
+#print(df$neighborhood[10])
+#print(neighborhoods$neighborhood[5])
+
+
+for (i in 1:51) {
+  for (j in 1:8) {
+    if (df$neighborhood[i] == neighborhoods$neighborhood[j]) {
+      if (is.na(df$rent_avg[i])) { df$rent_avg[i] = 0}
+      rent_avg[j] = rent_avg[j] + df$rent_avg[i]
+      
+      if (is.na(df$utilities_avg[i])) { df$utilities_avg[i] = as.numeric(0)}
+      util_avg[j] = util_avg[j] + as.numeric(df$utilities_avg[i])
+      
+      size[j] = size[j] + 1
+      
+      if (is.na(df$feb_drive_money[i])) { df$feb_drive_money[i] = 0}
+      if (is.na(df$oct_drive_money[i])) { df$oct_drive_money[i] = 0}
+       if (is.na(df$gas[i])) { df$gas[i] = 0}
+      transport[j] = transport[j] + ((df$feb_drive_money[i] + df$oct_drive_money[i]) / 2) + df$gas[i]
+    }
+  }
+}
+
+print(neighborhoods$neighborhood)
+print(rent_avg / size)
+print(util_avg / size)
+print(transport / size)
+print(size)
+```
+
+```{r}
+NO = c()
+SHN = c()
+shady = c()
+CO = c()
+SHS = c()
+other = c()
+SO = c()
+PB = c()
+for (i in 1:51) {
+    y <- df$neighborhood[i]
+    #if (is.na(df$tra[i])) {df$rent_avg[i] = 0}
+    if (is.na(df$feb_drive_money[i])) { df$feb_drive_money[i] = 0}
+    if (is.na(df$oct_drive_money[i])) { df$oct_drive_money[i] = 0}
+    if (is.na(df$gas[i])) { df$gas[i] = 0}
+    x <- ((df$feb_drive_money[i] + df$oct_drive_money[i]) / 2) + df$gas[i]
+
+    if (y == "North Oakland") {
+      NO <- c(NO, x)
+    }
+    if (y == "Squirrel Hill North") {
+      SHN <- c(SHN, x)
+    }
+    if (y == "Shadyside") {
+      shady <- c(shady, x)
+    }
+    if (y == "Center Oakland") {
+      CO <- c(CO, x)
+    }
+    if (y == "Squirrel Hill South") {
+      SHS <- c(SHS, x)
+    }
+    if (y == "Other") {
+      other <- c(other, x)
+    }
+    if (y == "South Oakland") {
+      SO <- c(SO, x)
+    }
+    if (y == "Point Breeze") {
+      PB <- c(PB, x)
+    }
+}
+print(sd(NO, na.rm = FALSE))
+print(sd(SHN, na.rm = FALSE))
+print(sd(shady, na.rm = FALSE))
+print(sd(CO, na.rm = FALSE))
+print(sd(SHS, na.rm = FALSE))
+print(sd(other, na.rm = FALSE))
+print(sd(SO, na.rm = FALSE))
+print(sd(PB, na.rm = FALSE))
+```
+
+```{r}
+count = 0
+for (i in 1:51){
+  if (df$own_car[i] == "Yes") {
+    print(df$neighborhood[i])
+    print(df$distance[i])
+    print(" ")
+    count = count + 1
+  }
+}
+```
